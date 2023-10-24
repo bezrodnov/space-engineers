@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SE Scripts", "SE Scripts.csproj", "{23A5B259-0C13-446D-8F80-2DB99259A0B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteOrderAndTransfer", "..\RemoteOrderAndTransfer\RemoteOrderAndTransfer.csproj", "{A01A701B-C86D-46DA-BC85-26C5816CFDD9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23A5B259-0C13-446D-8F80-2DB99259A0B2}.Debug|x64.ActiveCfg = Debug|x64
+		{23A5B259-0C13-446D-8F80-2DB99259A0B2}.Debug|x64.Build.0 = Debug|x64
+		{A01A701B-C86D-46DA-BC85-26C5816CFDD9}.Debug|x64.ActiveCfg = Debug|x64
+		{A01A701B-C86D-46DA-BC85-26C5816CFDD9}.Debug|x64.Build.0 = Debug|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {49F1CDA4-AFF0-44FE-9F82-A3619E411828}
+	EndGlobalSection
+EndGlobal
