@@ -30,15 +30,15 @@ namespace IngameScript
             _runtime = program.Runtime;
 
             _myBroadcastListener = IGC.RegisterBroadcastListener(Program.MESSAGE_TAG_BROADCAST);
+            _myBroadcastListener.SetMessageCallback();
+
             IGC.UnicastListener.SetMessageCallback();
 
-            _runtime.UpdateFrequency = UpdateFrequency.Update100;
+            logger.Clear();
         }
 
         public void Main(string argument, UpdateType updateType)
         {
-            //Log($"update type = {updateType}");
-
             switch (updateType)
             {
                 case UpdateType.IGC:
@@ -54,9 +54,6 @@ namespace IngameScript
                             SendIdToProvider();
                         }
                     }
-                    break;
-                default:
-                    AcceptMessages();
                     break;
             }
         }

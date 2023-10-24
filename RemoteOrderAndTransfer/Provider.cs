@@ -33,14 +33,15 @@ namespace IngameScript
             _runtime = program.Runtime;
 
             _myBroadcastListener = IGC.RegisterBroadcastListener(Program.MESSAGE_TAG_BROADCAST);
+            _myBroadcastListener.SetMessageCallback();
+
             IGC.UnicastListener.SetMessageCallback();
 
-            _runtime.UpdateFrequency = UpdateFrequency.Update100;
+            logger.Clear();
         }
 
         public void Main(string argument, UpdateType updateType)
         {
-            //Log($"update type = {updateType}");
             switch (updateType)
             {
                 case UpdateType.IGC:
@@ -50,7 +51,6 @@ namespace IngameScript
                     }
                 case UpdateType.Update100:
                     {
-                        AcceptMessages();
                         CheckOrdersToFulfill();
                         break;
                     }
@@ -74,7 +74,6 @@ namespace IngameScript
                 {
                     _messageTargetId = long.Parse(message.Data.ToString());
                     Log($"received broadcast message from {_messageTargetId}");
-
                     SendIdToConsumer();
                 }
             }
@@ -96,6 +95,7 @@ namespace IngameScript
                     orderedItems = null;
                     processedItems = null;
                     CollectAll(false);
+                    _runtime.UpdateFrequency = UpdateFrequency.None;
                     return;
                 }
 
@@ -245,15 +245,15 @@ namespace IngameScript
             return Utils.GetBlock<IMyShipConnector>(GridTerminalSystem, Program.PROVIDER_CONNECTOR, "Connector");
         }
 
-        private void Log(string message, bool append = true)
-        {
-            logger.Log("provider::" + message, append);
-        }
-
         private void CollectAll(bool collectAll)
         {
             GetConnector().CollectAll = collectAll;
             Log(collectAll ? "Collecting all" : "Not collecting all");
+        }
+
+        private void Log(string message, bool append = true)
+        {
+            logger.Log("provider::" + message, append);
         }
     }
 }

@@ -44,7 +44,7 @@ namespace IngameScript
 
         public Program()
         {
-            logger = new Logger(GetTextPanel());
+            logger = new Logger(GetTextPanel(), Echo);
 
             if (IS_CONSUMER)
             {
@@ -59,6 +59,12 @@ namespace IngameScript
 
         public void Main(string argument, UpdateType updateType)
         {
+            if ("clear_console".Equals(argument))
+            {
+                logger.Clear();
+                return;
+            }
+
             _provider?.Main(argument, updateType);
             _consumer?.Main(argument, updateType);
         }
