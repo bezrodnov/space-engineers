@@ -12,16 +12,81 @@ namespace IngameScript
 {
     internal class Provider
     {
-        private Program _program;
+        private readonly IMyIntergridCommunicationSystem IGC;
+        private readonly IMyGridTerminalSystem GridTerminalSystem;
+        private readonly Logger logger;
+        private readonly IMyGridProgramRuntimeInfo _runtime;
+
+        private readonly IMyBroadcastListener _myBroadcastListener;
+        private long _messageTargetId;
+
         private ImmutableDictionary<string, int> orderedItems;
         private Dictionary<string, int> processedItems;
+        private IMyProgrammableBlock Me { get; }
 
         public Provider(Program program)
         {
-            _program = program;
+            logger = program.logger;
+            IGC = program.IGC;
+            GridTerminalSystem = program.GridTerminalSystem;
+            Me = program.Me;
+            _runtime = program.Runtime;
+
+            _myBroadcastListener = IGC.RegisterBroadcastListener(Program.MESSAGE_TAG_BROADCAST);
+            IGC.UnicastListener.SetMessageCallback();
+
+            _runtime.UpdateFrequency = UpdateFrequency.Update100;
         }
 
-        public void CheckOrdersToFulfill()
+        public void Main(string argument, UpdateType updateType)
+        {
+            //Log($"update type = {updateType}");
+            switch (updateType)
+            {
+                case UpdateType.IGC:
+                    {
+                        AcceptMessages();
+                        break;
+                    }
+                case UpdateType.Update100:
+                    {
+                        AcceptMessages();
+                        CheckOrdersToFulfill();
+                        break;
+                    }
+            }
+        }
+
+        private void AcceptMessages()
+        {
+            while (IGC.UnicastListener.HasPendingMessage)
+            {
+                var message = IGC.UnicastListener.AcceptMessage();
+                Log($"received unicast message: {message.Data}");
+                var orderedItems = message.Data as ImmutableDictionary<string, int>;
+                AcceptOrder(orderedItems);
+            }
+
+            while (_myBroadcastListener.HasPendingMessage)
+            {
+                var message = _myBroadcastListener.AcceptMessage();
+                if (Program.MESSAGE_TAG_BROADCAST.Equals(message.Tag))
+                {
+                    _messageTargetId = long.Parse(message.Data.ToString());
+                    Log($"received broadcast message from {_messageTargetId}");
+
+                    SendIdToConsumer();
+                }
+            }
+        }
+
+        private void SendIdToConsumer()
+        {
+            Log($"sending id to consumer");
+            IGC.SendBroadcastMessage(Program.MESSAGE_TAG_BROADCAST, Me.EntityId);
+        }
+
+        private void CheckOrdersToFulfill()
         {
             if (orderedItems != null)
             {
@@ -30,6 +95,7 @@ namespace IngameScript
                     Log("Order was fulfilled!");
                     orderedItems = null;
                     processedItems = null;
+                    CollectAll(false);
                     return;
                 }
 
@@ -37,7 +103,7 @@ namespace IngameScript
             }
         }
 
-        public void AcceptOrder(ImmutableDictionary<string, int> orderedItems)
+        private void AcceptOrder(ImmutableDictionary<string, int> orderedItems)
         {
             this.orderedItems = orderedItems;
             processedItems = new Dictionary<string, int>();
@@ -49,6 +115,8 @@ namespace IngameScript
                     processedItems.Add(orderedItemType, 0);
                 }
             }
+
+            _runtime.UpdateFrequency = UpdateFrequency.Update100;
 
             ClearConnector();
         }
@@ -77,7 +145,7 @@ namespace IngameScript
                 }
 
                 var containers = new List<IMyCargoContainer>();
-                _program.GridTerminalSystem.GetBlocksOfType(containers);
+                GridTerminalSystem.GetBlocksOfType(containers);
                 foreach (var container in containers)
                 {
                     var inventory = container.GetInventory();
@@ -109,14 +177,13 @@ namespace IngameScript
             }
 
             connector.Disconnect();
-            connector.CollectAll = true;
-            Log("Collecting all");
+            CollectAll(true);
         }
 
         private void ClearConnector()
         {
             var connector = GetConnector();
-            connector.CollectAll = false;
+            CollectAll(false);
             Log("Not collecting all");
             if (!connector.IsConnected) { connector.Connect(); }
 
@@ -129,7 +196,7 @@ namespace IngameScript
             }
 
             var containers = new List<IMyCargoContainer>();
-            _program.GridTerminalSystem.GetBlocksOfType(containers);
+            GridTerminalSystem.GetBlocksOfType(containers);
             foreach (var container in containers)
             {
                 if (container.IsFunctional)
@@ -175,12 +242,18 @@ namespace IngameScript
 
         private IMyShipConnector GetConnector()
         {
-            return Utils.GetBlock<IMyShipConnector>(_program.GridTerminalSystem, Program.PROVIDER_CONNECTOR, "Connector");
+            return Utils.GetBlock<IMyShipConnector>(GridTerminalSystem, Program.PROVIDER_CONNECTOR, "Connector");
         }
 
         private void Log(string message, bool append = true)
         {
-            _program.logger.Log(message, append);
+            logger.Log("provider::" + message, append);
+        }
+
+        private void CollectAll(bool collectAll)
+        {
+            GetConnector().CollectAll = collectAll;
+            Log(collectAll ? "Collecting all" : "Not collecting all");
         }
     }
 }
