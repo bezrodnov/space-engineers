@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lift", "Lift.csproj", "{F9B016B2-3698-4D15-9B3A-C8A92CB8A13A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelfBuildingElevator", "..\SelfBuildingElevator\SelfBuildingElevator.csproj", "{9C575BD2-E053-4493-AF6D-C3957F5B84B8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F9B016B2-3698-4D15-9B3A-C8A92CB8A13A}.Debug|x64.ActiveCfg = Debug|x64
+		{F9B016B2-3698-4D15-9B3A-C8A92CB8A13A}.Debug|x64.Build.0 = Debug|x64
+		{9C575BD2-E053-4493-AF6D-C3957F5B84B8}.Debug|x64.ActiveCfg = Debug|x64
+		{9C575BD2-E053-4493-AF6D-C3957F5B84B8}.Debug|x64.Build.0 = Debug|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6A188292-F139-42F8-B0FE-1D5B8553B3BB}
+	EndGlobalSection
+EndGlobal
