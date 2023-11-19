@@ -10,33 +10,6 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        // CONFIG
-        public static readonly bool IS_CONSUMER = false;
-        public static readonly bool IS_PROVIDER = false;
-        public static readonly bool IS_RU = true; 
-        public static readonly string COMMAND_CONSUMER_ORDER = "order";
-        public static readonly string TEXT_PANEL = "LCD [sex_Trans]";
-        public static readonly string PROVIDER_CONNECTOR = "Connector [sex_Trans]";
-        public static readonly string MESSAGE_TAG_BROADCAST = "sex_Trans::broadcast::handshake";
-        public static readonly string MESSAGE_TAG_UNICAST_ORDER = "sex_Trans::unicast::order";
-        public static readonly ImmutableDictionary<string, string> ITEM_NAME_TO_TYPE = new Dictionary<string, string>() {
-            { "SteelPlate", "Component/SteelPlate" },
-
-            { "Камень", "Ore/Stone" },
-            { "Кремний", "Ore/Silicon" },
-            { "Железо", "Ore/Iron" },
-            { "Лёд", "Ore/Ice" },
-            { "Никель", "Ore/Nickel" },
-            { "Серебро", "Ore/Silver" },
-            { "Золото", "Ore/Gold" },
-            { "Платина", "Ore/Platinum" },
-            { "Кобальт", "Ore/Cobalt" },
-            { "Уран", "Ore/Uranium" },
-            { "Скрап", "Ore/Scrap" },
-            { "Магний", "Ore/Magnesium" },
-        }.ToImmutableDictionary();
-        // END OF CONFIG
-
         public Logger logger;
 
         private readonly Consumer _consumer;
@@ -46,14 +19,29 @@ namespace IngameScript
         {
             logger = new Logger(GetTextPanel(), Echo);
 
-            if (IS_CONSUMER)
+            var options = Me.CustomData.Split('\n');
+            foreach (var option in options)
             {
-                _consumer = new Consumer(this);
-            }
-
-            if (IS_PROVIDER)
-            {
-                _provider = new Provider(this);
+                var keyAndValue = option.Split('=');
+                if (keyAndValue.Length == 2)
+                {
+                    var key = keyAndValue[0];
+                    var value = keyAndValue[1];
+                    if (key == "provider")
+                    {
+                        if (value.ToLower().Equals("true"))
+                        {
+                            _provider = new Provider(this);
+                        }
+                    }
+                    else if (key.Equals("consumer"))
+                    {
+                        if (value.ToLower().Equals("true"))
+                        {
+                            _consumer = new Consumer(this);
+                        }
+                    }
+                }
             }
         }
 
@@ -71,7 +59,28 @@ namespace IngameScript
 
         private IMyTextPanel GetTextPanel()
         {
-            return Utils.GetBlock<IMyTextPanel>(GridTerminalSystem, TEXT_PANEL, "Text Panel");
+            return Utils.FindBlock<IMyTextPanel>(GridTerminalSystem, Config.TEXT_PANEL);
+        }
+
+        public static ItemType? GetItemType(string displayName)
+        {
+            foreach (var item in Config.RU_ITEM_NAMES)
+            {
+                if (item.Value.Equals(displayName))
+                {
+                    return item.Key;
+                }
+            }
+
+            foreach (var item in Config.EN_ITEM_NAMES)
+            {
+                if (item.Value.Equals(displayName))
+                {
+                    return item.Key;
+                }
+            }
+
+            return null;
         }
     }
 }

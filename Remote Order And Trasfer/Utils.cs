@@ -148,15 +148,6 @@ namespace IngameScript
             if (!Block.IsFunctional) { throw new Exception($"{name} is not functional"); }
             return (T)Block;
         }
-
-        public static T FindBlock<T>(IMyGridTerminalSystem GridTerminalSystem, string name) where T : IMyTerminalBlock
-        {
-            var Block = GridTerminalSystem.GetBlockWithName(name);
-
-            if (Block == null || !(Block is T)) { return default(T); }
-            if (!Block.IsFunctional) { throw new Exception($"{name} is not functional"); }
-            return (T) Block;
-        }
     }
 
 

@@ -20,8 +20,8 @@ namespace IngameScript
         private readonly IMyBroadcastListener _myBroadcastListener;
         private long _messageTargetId;
 
-        private ImmutableDictionary<string, long> orderedItems;
-        private Dictionary<string, long> processedItems;
+        private ImmutableDictionary<string, int> orderedItems;
+        private Dictionary<string, int> processedItems;
         private IMyProgrammableBlock Me { get; }
 
         public Provider(Program program)
@@ -32,7 +32,7 @@ namespace IngameScript
             Me = program.Me;
             _runtime = program.Runtime;
 
-            _myBroadcastListener = IGC.RegisterBroadcastListener(Config.MESSAGE_TAG_BROADCAST);
+            _myBroadcastListener = IGC.RegisterBroadcastListener(Program.MESSAGE_TAG_BROADCAST);
             _myBroadcastListener.SetMessageCallback();
 
             IGC.UnicastListener.SetMessageCallback();
@@ -63,14 +63,14 @@ namespace IngameScript
             {
                 var message = IGC.UnicastListener.AcceptMessage();
                 Log($"received unicast message: {message.Data}");
-                var orderedItems = message.Data as ImmutableDictionary<string, long>;
+                var orderedItems = message.Data as ImmutableDictionary<string, int>;
                 AcceptOrder(orderedItems);
             }
 
             while (_myBroadcastListener.HasPendingMessage)
             {
                 var message = _myBroadcastListener.AcceptMessage();
-                if (Config.MESSAGE_TAG_BROADCAST.Equals(message.Tag))
+                if (Program.MESSAGE_TAG_BROADCAST.Equals(message.Tag))
                 {
                     _messageTargetId = long.Parse(message.Data.ToString());
                     Log($"received broadcast message from {_messageTargetId}");
@@ -82,7 +82,7 @@ namespace IngameScript
         private void SendIdToConsumer()
         {
             Log($"sending id to consumer");
-            IGC.SendBroadcastMessage(Config.MESSAGE_TAG_BROADCAST, Me.EntityId);
+            IGC.SendBroadcastMessage(Program.MESSAGE_TAG_BROADCAST, Me.EntityId);
         }
 
         private void CheckOrdersToFulfill()
@@ -103,10 +103,10 @@ namespace IngameScript
             }
         }
 
-        private void AcceptOrder(ImmutableDictionary<string, long> orderedItems)
+        private void AcceptOrder(ImmutableDictionary<string, int> orderedItems)
         {
             this.orderedItems = orderedItems;
-            processedItems = new Dictionary<string, long>();
+            processedItems = new Dictionary<string, int>();
             foreach (var orderedItem in orderedItems)
             {
                 var orderedItemType = orderedItem.Key;
@@ -160,15 +160,13 @@ namespace IngameScript
                     {
                         if (item.Type.ToString().EndsWith(orderedItemType))
                         {
-                            var amountToTransfer = (VRage.MyFixedPoint) (double) Math.Min(item.Amount.ToIntSafe(), remainingRequiredQuantity);
+                            var amountToTransfer = (VRage.MyFixedPoint)Math.Min(item.Amount.ToIntSafe(), remainingRequiredQuantity);
                             if (inventory.TransferItemTo(connectorInventory, item, amountToTransfer))
                             {
                                 remainingRequiredQuantity -= amountToTransfer.ToIntSafe();
-                                processedItems[orderedItemType] += amountToTransfer.ToIntSafe();
-
-                                Log($"Transfered {amountToTransfer.ToIntSafe()} of {orderedItemType}");
+                                processedItems[orderedItemType] = amountToTransfer.ToIntSafe();
+                                Log($"Transfered {amountToTransfer.ToIntSafe()} of {orderedItemType}\nNeed {remainingRequiredQuantity} more of these xD");
                                 if (remainingRequiredQuantity == 0) break;
-                                Log($"Need {{remainingRequiredQuantity}} more of these xD\"");
                             }
                         }
                     }
@@ -225,16 +223,15 @@ namespace IngameScript
 
         private bool IsOrderFulfilled()
         {
-            if (processedItems == null || orderedItems == null)
+            if (processedItems == null || orderedItems == null || orderedItems.Count != processedItems.Count)
             {
                 return false;
             }
 
-            foreach (var orderedItem in orderedItems)
+            foreach (var orderedItem in processedItems)
             {
-                if (!processedItems.ContainsKey(orderedItem.Key) || processedItems[orderedItem.Key] != orderedItem.Value)
+                if (orderedItems[orderedItem.Key] != orderedItem.Value)
                 {
-                    Log($"Need {orderedItem.Value} more of {orderedItem.Key}");
                     return false;
                 }
             }
@@ -244,7 +241,7 @@ namespace IngameScript
 
         private IMyShipConnector GetConnector()
         {
-            return Utils.GetBlock<IMyShipConnector>(GridTerminalSystem, Config.PROVIDER_CONNECTOR, "Connector");
+            return Utils.GetBlock<IMyShipConnector>(GridTerminalSystem, Program.PROVIDER_CONNECTOR, "Connector");
         }
 
         private void CollectAll(bool collectAll)
