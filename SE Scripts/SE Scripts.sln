@@ -3,9 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SE Scripts", "SE Scripts.csproj", "{23A5B259-0C13-446D-8F80-2DB99259A0B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drilling Rover", "Drilling Rover.csproj", "{23A5B259-0C13-446D-8F80-2DB99259A0B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteOrderAndTransfer", "..\RemoteOrderAndTransfer\RemoteOrderAndTransfer.csproj", "{A01A701B-C86D-46DA-BC85-26C5816CFDD9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remote Order And Transfer", "..\RemoteOrderAndTransfer\Remote Order And Transfer.csproj", "{A01A701B-C86D-46DA-BC85-26C5816CFDD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumpDriveChargeOptimization", "..\JumpDriveChargeOptimization\JumpDriveChargeOptimization.csproj", "{A2A73BE7-E0CC-4F8E-B04C-77747F2ED965}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Block Naming Assistent", "..\Block Naming Assistent\Block Naming Assistent.csproj", "{1BDBE96E-BBC6-4616-8D67-4E0AB210A952}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collect All Management", "..\Collect All Management\Collect All Management.csproj", "{29507E3C-AA10-4EF8-B29B-965A226D749D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base Manager", "..\Base Manager\Base Manager.csproj", "{DC5747F8-CC98-4BF8-BE2E-DDD75EC8EDBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,6 +24,14 @@ Global
 		{23A5B259-0C13-446D-8F80-2DB99259A0B2}.Debug|x64.Build.0 = Debug|x64
 		{A01A701B-C86D-46DA-BC85-26C5816CFDD9}.Debug|x64.ActiveCfg = Debug|x64
 		{A01A701B-C86D-46DA-BC85-26C5816CFDD9}.Debug|x64.Build.0 = Debug|x64
+		{A2A73BE7-E0CC-4F8E-B04C-77747F2ED965}.Debug|x64.ActiveCfg = Debug|x64
+		{A2A73BE7-E0CC-4F8E-B04C-77747F2ED965}.Debug|x64.Build.0 = Debug|x64
+		{1BDBE96E-BBC6-4616-8D67-4E0AB210A952}.Debug|x64.ActiveCfg = Debug|x64
+		{1BDBE96E-BBC6-4616-8D67-4E0AB210A952}.Debug|x64.Build.0 = Debug|x64
+		{29507E3C-AA10-4EF8-B29B-965A226D749D}.Debug|x64.ActiveCfg = Debug|x64
+		{29507E3C-AA10-4EF8-B29B-965A226D749D}.Debug|x64.Build.0 = Debug|x64
+		{DC5747F8-CC98-4BF8-BE2E-DDD75EC8EDBB}.Debug|x64.ActiveCfg = Debug|x64
+		{DC5747F8-CC98-4BF8-BE2E-DDD75EC8EDBB}.Debug|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
