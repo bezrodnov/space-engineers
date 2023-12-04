@@ -38,7 +38,15 @@ namespace IngameScript
         {
             if (connector != null)
             {
-                connector.CollectAll = !connector.IsConnected;
+                if (connector.GetInventory().IsFull && connector.CollectAll)
+                {
+                    // turn off collecting just once in case collector got bugged
+                    connector.CollectAll = false;
+                }
+                else
+                {
+                    connector.CollectAll = !connector.IsConnected;
+                }
             }
         }
     }
