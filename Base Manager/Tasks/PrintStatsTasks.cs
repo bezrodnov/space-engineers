@@ -100,13 +100,13 @@ namespace IngameScript.Tasks
             }
         }
 
-        private String GetEnergyStatus()
+        private string GetEnergyStatus()
         {
             var powerStats = _program.powerStats;
             var EnergyBalance = powerStats.Production - powerStats.Consumption;
             var EstimatedTime = EnergyBalance < 0 ? powerStats.Stored / EnergyBalance : (powerStats.Capacity - powerStats.Stored) / EnergyBalance;
             var EstimatedTimeInSeconds = EstimatedTime * 3600;
-            var EstimatedTimeString = Math.Abs(EstimatedTimeInSeconds) > 1 ? String.Format("Батареи {0} через {1}",
+            var EstimatedTimeString = Math.Abs(EstimatedTimeInSeconds) > 1 ? string.Format("Батареи {0} через {1}",
                 EstimatedTimeInSeconds > 0 ? "зарядятся" : "разрядятся",
                 Utils.FormatTime(Math.Abs(EstimatedTimeInSeconds))
              ) : "";
@@ -116,15 +116,15 @@ namespace IngameScript.Tasks
             sb.AppendLine($"Энергия: {Utils.FormatNumber(powerStats.Stored)}/{Utils.FormatNumber(powerStats.Capacity)} MWh ({EnergyPercentage.ToString("P", System.Globalization.CultureInfo.InvariantCulture)})");
             sb.AppendLine($"Производство/Потребление: {Utils.FormatNumber(powerStats.Production)}/{Utils.FormatNumber(powerStats.Consumption)} MW");
             sb.AppendLine(EstimatedTimeString);
-            sb.AppendLine(String.Format("Режим сбережения {0}", _program.isEnergySafetyOn ? "включен" : "выключен"));
+            sb.AppendLine(string.Format("Режим сбережения {0}", _program.isEnergySafetyOn ? "включен" : "выключен"));
 
             return sb.ToString();
         }
 
-        private String GetOreStatus()
+        private string GetOreStatus()
         {
-            var OreAmountByType = new Dictionary<String, float>();
-            var IngotAmountByType = new Dictionary<String, float>();
+            var OreAmountByType = new Dictionary<string, float>();
+            var IngotAmountByType = new Dictionary<string, float>();
 
             var BlocksWithItems = new List<IMyTerminalBlock>();
             BlocksWithItems.AddRange(_program.RefineryBlocks);
@@ -167,25 +167,25 @@ namespace IngameScript.Tasks
 
             var sb = new StringBuilder();
             sb.AppendLine("╔════════════════════╦════════════════════╗");
-            sb.AppendLine(String.Format("║ {0,-19}║ {1, -19}║", "Руда", "Слитки"));
+            sb.AppendLine(string.Format("║ {0,-19}║ {1, -19}║", "Руда", "Слитки"));
             sb.AppendLine("╠════════════════════╬════════════════════╣");
 
             var length = Math.Max(OreAmountByType.Count, IngotAmountByType.Count);
 
             for (var i = 0; i < length; i++)
             {
-                var ore = i < OreAmountByType.Count ? Utils.FormatResourceAmount(OreAmountByType.ElementAt(i).Key, OreAmountByType.ElementAt(i).Value) : "";
-                var ingot = i < IngotAmountByType.Count ? Utils.FormatResourceAmount(IngotAmountByType.ElementAt(i).Key, IngotAmountByType.ElementAt(i).Value) : "";
-                sb.AppendLine(String.Format("║ {0,-19}║ {1,-19}║", ore, ingot));
+                var ore = i < OreAmountByType.Count ? Utils.FormatResourceAmount(OreAmountByType.ElementAt(i).Key, OreAmountByType.ElementAt(i).Value, 11) : "";
+                var ingot = i < IngotAmountByType.Count ? Utils.FormatResourceAmount(IngotAmountByType.ElementAt(i).Key, IngotAmountByType.ElementAt(i).Value, 11) : "";
+                sb.AppendLine(string.Format("║ {0,-19}║ {1,-19}║", ore, ingot));
             }
             sb.AppendLine("╚════════════════════╩════════════════════╝");
 
             return sb.ToString();
         }
 
-        private String GetComponentStatus()
+        private string GetComponentStatus()
         {
-            var ComponentAmountByType = new Dictionary<String, float>();
+            var ComponentAmountByType = new Dictionary<string, float>();
 
             var BlocksWithItems = new List<IMyTerminalBlock>();
             BlocksWithItems.AddRange(_program.RefineryBlocks);
@@ -219,13 +219,14 @@ namespace IngameScript.Tasks
 
             var sb = new StringBuilder();
             sb.AppendLine("╔═════════════════════════════════════════╗");
-            sb.AppendLine(String.Format("║ {0,-40}║", "Компоненты"));
+            sb.AppendLine(string.Format("║ {0,-40}║", "Компоненты"));
             sb.AppendLine("╠═════════════════════════════════════════╣");
 
             for (var i = 0; i < ComponentAmountByType.Count; i++)
             {
-                var componentInfo = Utils.FormatResourceAmount(ComponentAmountByType.ElementAt(i).Key, ComponentAmountByType.ElementAt(i).Value);
-                sb.AppendLine(String.Format("║ {0,-40}║", componentInfo));
+                var amount = ComponentAmountByType.ElementAt(i);
+                var componentInfo = Utils.FormatResourceAmount(amount.Key, amount.Value, 32);
+                sb.AppendLine(string.Format("║ {0,-40}║", componentInfo));
             }
             sb.AppendLine("╚═════════════════════════════════════════╝");
 

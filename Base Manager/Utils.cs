@@ -13,9 +13,9 @@ namespace IngameScript
             return string.Format("{0:0.00}", value);
         }
 
-        public static string FormatResourceAmount(string resourceType, float amount)
+        public static string FormatResourceAmount(string resourceType, float amount, int labelLength)
         {
-            return string.Format("{0,-11}{1,7} ", I18N(resourceType), FormatNumberNice(amount, 3));
+            return string.Format("{0,-" + labelLength + "}{1,7} ", I18N(resourceType), FormatNumberNice(amount, 3));
         }
 
         public static string FormatTime(double seconds)
@@ -51,6 +51,7 @@ namespace IngameScript
            { "Uranium", "Уран" },
            { "Scrap", "Скрап" },
            { "Magnesium", "Магний" },
+           { "Sand", "Песок" },
         };
 
         private static string I18N(string text)

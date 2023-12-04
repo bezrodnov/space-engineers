@@ -24,7 +24,7 @@ namespace IngameScript
 
     partial class Program : MyGridProgram
     {
-        public static readonly float POWER_RATIO_SAFETY_THRESHOLD = 0.9f;
+        public static readonly float POWER_RATIO_SAFETY_THRESHOLD = 0.2f;
         public static readonly string DISABLE_AUTO_TURN_ON_TAG = "disable_auto_turn_on";
         public static readonly string POWER_STATS_DISPLAYS_TAG = "power_stats";
         public static readonly string ORE_STATS_DISPLAYS_TAG = "ore_stats";
