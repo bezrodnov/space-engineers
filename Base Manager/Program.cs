@@ -29,6 +29,7 @@ namespace IngameScript
         public static readonly string POWER_STATS_DISPLAYS_TAG = "power_stats";
         public static readonly string ORE_STATS_DISPLAYS_TAG = "ore_stats";
         public static readonly string COMPONENT_STATS_DISPLAYS_TAG = "component_stats";
+        public static readonly string INVENTORY_MANAGEMENT_IGNORE_TAG = "-inventory";
 
         public static readonly bool PRINT_DEBUG = true;
 
@@ -43,6 +44,7 @@ namespace IngameScript
         public List<IMyGasGenerator> GasGeneratorBlocks;
         public List<IMyRefinery> RefineryBlocks;
         public bool isEnergyBalanceEnabled = true;
+        public bool isInventoryManagementEnabled = true;
 
 
         public PowerStats powerStats = new PowerStats(0, 0, 0, 0);
@@ -61,6 +63,11 @@ namespace IngameScript
             if (isEnergyBalanceEnabled)
             {
                 _taskManager.Schedule(new ManageEnergyBalanceTask(this), 900, 40);
+            }
+
+            if (isInventoryManagementEnabled)
+            {
+                _taskManager.Schedule(new ManageInventoryTask(this), 1000, 50);
             }
 
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
@@ -84,6 +91,17 @@ namespace IngameScript
                 _maxInstructions = Math.Max(_maxInstructions, Runtime.CurrentInstructionCount);
                 Echo($"Instructions executed: {Runtime.CurrentInstructionCount} (peek {_maxInstructions})");
             }
+        }
+
+        public void Troubleshoot(Exception e)
+        {
+            Log($"\n Ooops, something went wrong. {e.Message}\n{e.StackTrace}");
+        }
+
+        public void Log(string message, bool clearLog = false)
+        {
+            var appendNewLine = !clearLog && Me.GetSurface(0).GetText().Length < 3000;
+            Me.GetSurface(0).WriteText($"{message}\n", appendNewLine);
         }
     }
 }

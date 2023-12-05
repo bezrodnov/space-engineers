@@ -22,7 +22,8 @@ namespace IngameScript.Tasks
 {
     class SyncBlocksTask : Task
     {
-        private Program _program;
+        readonly Program _program;
+
         private IMyGridTerminalSystem GridTerminalSystem
         {
             get
@@ -32,7 +33,7 @@ namespace IngameScript.Tasks
         }
         public SyncBlocksTask(Program program)
         {
-            this._program = program;
+            _program = program;
         }
 
         string Task.Id

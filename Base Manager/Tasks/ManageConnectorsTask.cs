@@ -9,7 +9,7 @@ namespace IngameScript.Tasks
 {
     internal class ManageConnectorsTask : Task
     {
-        private Program _program;
+        readonly Program _program;
 
         public ManageConnectorsTask(Program program)
         {

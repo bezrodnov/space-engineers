@@ -39,6 +39,7 @@
   <Import Project="MDK/MDK.paths.props" Condition="exists('MDK/MDK.paths.props')" />
   <ItemGroup>
     <Compile Include="Tasks\CapturePowerStatsTask.cs" />
+    <Compile Include="Tasks\ManageInventoryTask.cs" />
     <Compile Include="Tasks\ManageConnectorsTask.cs" />
     <Compile Include="Tasks\ManageEnergyBalanceTask.cs" />
     <Compile Include="MDK\Bootstrapper.cs" />

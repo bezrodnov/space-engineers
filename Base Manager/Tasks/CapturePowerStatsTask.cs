@@ -8,10 +8,11 @@ namespace IngameScript.Tasks
 {
     class CapturePowerStatsTask : Task
     {
-        Program _program;
+        readonly Program _program;
+
         public CapturePowerStatsTask(Program program)
         {
-            this._program = program;
+            _program = program;
         }
 
         string Task.Id

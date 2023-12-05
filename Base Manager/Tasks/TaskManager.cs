@@ -9,13 +9,14 @@ namespace IngameScript.Tasks
 {
     class TaskManager
     {
+        readonly Program _program;
+
         private readonly Dictionary<Task, Schedule> scheduledTasks = new Dictionary<Task, Schedule>();
         private readonly Queue<Task> tasksScheduledOnce = new Queue<Task>();
-        private Program _program;
 
         public TaskManager(Program program)
         {
-            this._program = program;
+            _program = program;
         }
 
         public void Schedule(Task task, int frequency, int delay = 0)

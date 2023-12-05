@@ -22,11 +22,11 @@ namespace IngameScript.Tasks
 {
     class ManageEnergyBalanceTask : Task
     {
-        Program _program;
+        readonly Program _program;
 
         public ManageEnergyBalanceTask(Program program)
         {
-            this._program = program;
+            _program = program;
         }
 
         string Task.Id
