@@ -44,7 +44,7 @@ namespace IngameScript
         public List<IMyGasGenerator> GasGeneratorBlocks;
         public List<IMyRefinery> RefineryBlocks;
         public bool isEnergyBalanceEnabled = true;
-        public bool isInventoryManagementEnabled = true;
+        public bool isInventoryManagementEnabled = false;
 
 
         public PowerStats powerStats = new PowerStats(0, 0, 0, 0);

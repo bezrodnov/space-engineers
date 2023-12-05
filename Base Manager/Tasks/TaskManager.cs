@@ -29,7 +29,7 @@ namespace IngameScript.Tasks
             tasksScheduledOnce.Enqueue(task);
         }
 
-        public void Run(int step)
+        public void Run(int step = 1)
         {
             if (tasksScheduledOnce.Count > 0)
             {

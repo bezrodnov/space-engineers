@@ -23,11 +23,19 @@ namespace IngameScript.Tasks
 {
     class ManageInventoryTask : Task
     {
-        readonly Program _program;
+        private readonly Program _program;
+        private readonly TaskManager _taskManager;
+        private readonly LinkedList<IMyCubeBlock> _containers = new LinkedList<IMyCubeBlock>();
+        private readonly List<List<IMyCubeBlock>> _chains = new List<List<IMyCubeBlock>>();
 
         public ManageInventoryTask(Program program)
         {
             _program = program;
+
+            _taskManager = new TaskManager(program);
+            _taskManager.Schedule(new GetContainersSubtask(program, _containers), 3);
+            _taskManager.Schedule(new GroupContainersInChainsSubtask(program, _containers, _chains), 3, 1);
+            _taskManager.Schedule(new OptimizeInventorySubtask(program, _chains), 3, 2);
         }
 
         string Task.Id
@@ -48,34 +56,100 @@ namespace IngameScript.Tasks
 
         void Task.Run()
         {
-            var containersToAnalyze = new LinkedList<IMyCubeBlock>(_program.CargoContainerBlocks);
-            _program.AssemblerBlocks.ForEach(block => containersToAnalyze.AddLast(block));
-            _program.RefineryBlocks.ForEach(block => containersToAnalyze.AddLast(block));
+            _taskManager.Run();
+        }
+    }
+
+    class GetContainersSubtask : Task
+    {
+        private readonly Program _program;
+        private readonly LinkedList<IMyCubeBlock> _containersToAnalyze;
+
+        public GetContainersSubtask(Program program, LinkedList<IMyCubeBlock> containersToAnalyze)
+        {
+            _program = program;
+            _containersToAnalyze = containersToAnalyze;
+        }
+
+        string Task.Id
+        {
+            get
+            {
+                return "Getting containers to analyze";
+            }
+        }
+
+        string Task.Name
+        {
+            get
+            {
+                return "Getting containers to analyze";
+            }
+        }
+
+        void Task.Run()
+        {
+            _containersToAnalyze.Clear();
+            AddContainers(_program.AssemblerBlocks);
+            AddContainers(_program.RefineryBlocks);
             foreach (var connectors in _program._connectorsByTags.Values)
             {
-                foreach (var connector in connectors)
+                AddContainers(connectors);
+            }
+
+            _program.Log($"Found {_containersToAnalyze.Count} inventories");
+        }
+
+        private void AddContainers<T>(IEnumerable<T> containers) where T : IMyCubeBlock
+        {
+            foreach (var container in containers)
+            {
+                if (!ShouldIgnoreContainer(container))
                 {
-                    containersToAnalyze.AddLast(connector);
+                    _containersToAnalyze.AddLast(container);
                 }
             }
+        }
 
-            _program.Log($"Found {containersToAnalyze.Count} inventories");
+        private bool ShouldIgnoreContainer(IMyCubeBlock container)
+        {
+            return !container.CubeGrid.IsSameConstructAs(_program.Me.CubeGrid)
+                || Utils.getBlockName(container).Contains($"[{Program.INVENTORY_MANAGEMENT_IGNORE_TAG}]");
+        }
+    }
 
-            var containersToIgnore = new List<IMyCubeBlock>();
-            foreach (var container in containersToAnalyze)
+    class GroupContainersInChainsSubtask : Task
+    {
+        private readonly Program _program;
+        private readonly LinkedList<IMyCubeBlock> _containers;
+        private readonly List<List<IMyCubeBlock>> _chains;
+
+        public GroupContainersInChainsSubtask(Program program, LinkedList<IMyCubeBlock> containers, List<List<IMyCubeBlock>> chains)
+        {
+            _program = program;
+            _containers = containers;
+            _chains = chains;
+        }
+
+        string Task.Id
+        {
+            get
             {
-                if (container.DisplayNameText.Contains($"[{Program.INVENTORY_MANAGEMENT_IGNORE_TAG}]"))
-                {
-                    containersToIgnore.Add(container);
-                }
+                return "Groupping containers in chains";
             }
+        }
 
-            _program.Log($"Inventories with ignore tag: {containersToIgnore.Count} inventories");
-            foreach (var toRemove in containersToIgnore)
+        string Task.Name
+        {
+            get
             {
-                containersToAnalyze.Remove(toRemove);
+                return "Groupping containers in chains";
             }
+        }
 
+        void Task.Run()
+        {
+            var containersToAnalyze = new LinkedList<IMyCubeBlock>(_containers);
             var chains = new List<List<IMyCubeBlock>>();
             List<IMyCubeBlock> currentChain = null;
 
@@ -102,13 +176,12 @@ namespace IngameScript.Tasks
                 containersToRemove.ForEach(toRemove => containersToAnalyze.Remove(toRemove));
             }
 
-
-            var chainsWithMoreThanOneElement = new List<List<IMyCubeBlock>>();
+            _chains.Clear();
             foreach (var chain in chains)
             {
                 if (chain.Count > 1)
                 {
-                    chainsWithMoreThanOneElement.Add(chain);
+                    _chains.Add(chain);
                 }
                 else
                 {
@@ -116,9 +189,40 @@ namespace IngameScript.Tasks
                 }
             }
 
-            _program.Log($"Found {chains.Count} connected container chains\n{chainsWithMoreThanOneElement.Count} of them have/has more than one container");
+            _program.Log($"Found {chains.Count} connected container chains\n{_chains.Count} of them have/has more than one container");
+        }
+    }
 
-            foreach (var chain in chainsWithMoreThanOneElement)
+    class OptimizeInventorySubtask : Task
+    {
+        private readonly Program _program;
+        private readonly List<List<IMyCubeBlock>> _chains = new List<List<IMyCubeBlock>>();
+
+        public OptimizeInventorySubtask(Program program, List<List<IMyCubeBlock>> chains)
+        {
+            _program = program;
+            _chains = chains;
+        }
+
+        string Task.Id
+        {
+            get
+            {
+                return "Optimizing inventory";
+            }
+        }
+
+        string Task.Name
+        {
+            get
+            {
+                return "Optimizing inventory";
+            }
+        }
+
+        void Task.Run()
+        {
+            foreach (var chain in _chains)
             {
                 OptimizeInventory(chain);
             }
@@ -128,7 +232,7 @@ namespace IngameScript.Tasks
         {
             try
             {
-                _program.Log($"Found {chain.Count} connected inventories: {String.Join(", ", chain.ConvertAll(Utils.getBlockName))}");
+                _program.Log($"Found {chain.Count} connected inventories: {string.Join(", ", chain.ConvertAll(Utils.getBlockName))}");
                 var cargoInventories = chain.FindAll(b => b is IMyCargoContainer).ConvertAll(b => b.GetInventory());
                 if (cargoInventories.Count == 0)
                 {
@@ -136,7 +240,7 @@ namespace IngameScript.Tasks
                     return;
                 }
 
-                _program.Log($"Found {cargoInventories.Count} connected cargo inventories: {String.Join(", ", cargoInventories.ConvertAll(i => i.Owner).ConvertAll(Utils.getBlockName))}");
+                _program.Log($"Found {cargoInventories.Count} connected cargo inventories: {string.Join(", ", cargoInventories.ConvertAll(i => i.Owner).ConvertAll(Utils.getBlockName))}");
                 cargoInventories.Sort(Comparer<IMyInventory>.Create((a, b) => (int)(b.MaxVolume - a.MaxVolume)));
 
                 foreach (var inventory in cargoInventories)
@@ -217,7 +321,7 @@ namespace IngameScript.Tasks
                         var itemInfo = item.Type.GetItemInfo();
                         if ((itemInfo.IsOre || itemInfo.IsIngot) && inventory.CanTransferItemTo(largestCargoInventory, item.Type))
                         {
-                            _program.   Log($"Moving {itemInfo.Volume} litres of {item.Type} to {Utils.getBlockName(largestCargoInventory.Owner)}");
+                            _program.Log($"Moving {itemInfo.Volume} litres of {item.Type} to {Utils.getBlockName(largestCargoInventory.Owner)}");
                             inventory.TransferItemTo(largestCargoInventory, item);
                         }
                     }
